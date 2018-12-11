@@ -12,16 +12,16 @@
   src: https://github.com/uclalibrary/uclalib_role_java
 - name: uclalib_role_apache
   src: https://github.com/uclalibrary/uclalib_role_apache
-- name: uclalib_role_solr7
-  src: https://github.com/uclalibrary/uclalib_role_solr7
+- name: ansible-role-solr 
+  src: https://github.com/kevincoakley/ansible-role-solr
 - name: uclalib_role_tomcat
   src: https://github.com/uclalibrary/uclalib_role_tomcat
 - name: uclalib_role_fedora4
-  src: https://github.com/uclalibrary/uclalib_role_fedora4
+  src: https://github.com/notch8/uclalib_role_fedora4
 - name: uclalib_role_samvera_basepackages
   src: https://github.com/uclalibrary/uclalib_role_samvera_basepackages
 - name: uclalib_role_clamav
-  src: https://github.com/uclalibrary/uclalib_role_clamav
+  src: https://github.com/notch8/uclalib_role_clamav
 - name: uclalib_role_pip
   src: https://github.com/uclalibrary/uclalib_role_pip
 - name: uclalib_role_imagemagick

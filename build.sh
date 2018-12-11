@@ -1,5 +1,5 @@
 #! /bin/bash
-
+set -x
 #
 # A little wrapper Bash script to make building easier.
 #
@@ -94,6 +94,14 @@ elif [ "$LINUX_DISTRO" != "ubuntu" ] && [ "$LINUX_DISTRO" != "centos" ]; then
   exit 1
 fi
 
+if [ "$1" == "base" ] || [ "$1" == "archivematica" ]; then
+    AWS_SOURCE_AMI="CentOS Linux 7 x86_64 HVM EBS*"
+    AWS_AMI_OWNER=679593333241
+else
+    AWS_SOURCE_AMI="${PROJECT_NAME}-base-${LINUX_DISTO}*"
+    AWS_AMI_OWNER=self
+fi
+
 # Label a build artifact pushed to Vagrant Cloud with either SNAPSHOT or a tag/branch name
 if [ -z "$PROJECT_NAME" ] || [ -z "$PROJECT_OWNER" ]; then
   echo "The config.json file is missing the project_owner and project_name variables"
@@ -113,16 +121,16 @@ else
 fi
 
 # We need to filter the JSON because Packer doesn't support tagged/conditional post-processors
-FILTER=(jq '.["post-processors"][0] |= map(select(.type != "vagrant-cloud"))' samvera-${1}-${LINUX_DISTRO}.json)
+FILTER=(jq '.["post-processors"][0] |= map(select(.type != "vagrant-cloud"))' samvera-base-${LINUX_DISTRO}.json)
 
 if [ -z "$1" ]; then
   printUsage
 elif [ "$2" == "ami" ] || [ "$2" == "box" ]; then
-  if [ "$1" == "base" ] || [ "$1" == "hyrax" ]; then
+    if [ "$1" == "base" ] || [ "$1" == "storage" ] || [ "$1" == "archivematica" ] || [ "$1" == "hyku" ] || [ "$1" == "hyrax" ]; then
      TMPFILE=$(mktemp)
      "${FILTER[@]}" > "$TMPFILE"
      PACKER_LOG="$PACKER_LOG" packer "$PACKER_ACTION" -only="$2" -var-file="config.json" $ON_ERROR \
-       -var="linux_distro=$LINUX_DISTRO" -var="vb_memory=$VB_MEMORY" -var="vb_cpu_cores=$VB_CPU_CORES" \
+       -var="linux_distro=$LINUX_DISTRO" -var="vb_memory=$VB_MEMORY" -var="vb_cpu_cores=$VB_CPU_CORES" -var="playbook=$1" -var="aws_source_ami=$AWS_SOURCE_AMI" -var="aws_ami_owner=$AWS_AMI_OWNER" \
        -var="build_version=$BUILD_VERSION" "$TMPFILE"
   else
     printUsage
@@ -133,7 +141,8 @@ elif [ "$2" == "fast" ] || [ -z "$2" ]; then
      "${FILTER[@]}" > "$TMPFILE"
      PACKER_LOG="$PACKER_LOG" packer "$PACKER_ACTION" -var-file="config.json" $ON_ERROR \
        -var="linux_distro=$LINUX_DISTRO" -var="vb_memory=$VB_MEMORY" -var="vb_cpu_cores=$VB_CPU_CORES" \
-       -var="build_version=$BUILD_VERSION" "$TMPFILE"
+       -var="build_version=$BUILD_VERSION" -var="playbook=$1" -var="aws_source_ami=$AWS_SOURCE_AMI" \
+       -var="aws_ami_owner=$AWS_AMI_OWNER" "$TMPFILE"
   else
     printUsage
   fi

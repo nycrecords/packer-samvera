@@ -4,8 +4,11 @@
         "aws_access_key": "",
         "aws_secret_key": "",
         "aws_region": "",
+        "aws_bucket": "",
         "samvera_db_user": "",
         "samvera_db_password": "",
+        "samvera_admin_user": "",
+        "samvera_admin_password": "",
         "fcdb_user": "",
         "fcdb_password": "",
         "root_db_password": "",
@@ -17,16 +20,17 @@
         "vagrant_cloud_token": "",
         "vagrant_cloud_user": "",
         "centos_version": "7",
-        "vagrant_source_iso": "CentOS-7-x86_64-Minimal-1804.iso",
-        "vagrant_source_iso_sha256_checksum": "714acc0aefb32b7d51b515e25546835e55a90da9fb00417fbee2d03a62801efd",
+        "vagrant_source_iso": "CentOS-7-x86_64-Minimal-1810.iso",
+        "vagrant_source_iso_sha256_checksum": "38d5d51d9d100fd73df031ffd6bd8b1297ce24660dc8c13a3b8b4534a4bd291c",
         "vagrant_guest_additions_iso": "http://download.virtualbox.org/virtualbox/5.2.12/VBoxGuestAdditions_5.2.12.iso",
         "vagrant_guest_additions_iso_sha256_checksum": "b81d283d9ef88a44e7ac8983422bead0823c825cbfe80417423bd12de91b8046",
-        "aws_source_ami": "ubuntu/images/*ubuntu-xenial-16.04-amd64-server-*",
-        "aws_ami_owner": "099720109477",
+        "aws_source_ami": "CentOS Linux 7 x86_64 HVM EBS*",
+        "aws_ami_owner": "679593333241",
         "vb_memory": "4096",
         "vb_cpu_cores": "",
         "runid": "{{env `PACKER_RUN_UUID`}}",
-        "linux_distro": ""
+        "linux_distro": "",
+        "playbook": "base"
     },
     "builders": [{
             "type": "amazon-ebs",
@@ -34,6 +38,8 @@
             "access_key": "{{ user `aws_access_key` }}",
             "secret_key": "{{ user `aws_secret_key` }}",
             "region": "{{ user `aws_region` }}",
+            "ssh_keypair_name": "doris-services-keys",
+            "ssh_private_key_file": "./doris-services-keys",
             "source_ami_filter": {
                 "filters": {
                     "virtualization-type": "hvm",
@@ -46,9 +52,9 @@
             "force_deregister": true,
             "force_delete_snapshot": true,
             "instance_type": "t2.medium",
-            "ssh_username": "ubuntu",
-            "ami_name": "{{ user `project_name` }}-base-{{ user `linux_distro` }} {{ timestamp }}",
-            "ami_description": "A base box for {{ user `project_name` }} ({{ user `linux_distro` }})"
+            "ssh_username": "centos",
+            "ami_name": "{{ user `project_name` }}-{{ user `playbook` }}-{{ user `linux_distro` }} {{ timestamp }}",
+            "ami_description": "A {{ user `playbook` }} box for {{ user `project_name` }} ({{ user `linux_distro` }})"
         },
         {
             "type": "virtualbox-iso",
@@ -76,7 +82,7 @@
             "guest_additions_sha256": "{{ user `vagrant_guest_additions_iso_sha256_checksum` }}",
             "virtualbox_version_file": ".vbox_version",
             "output_directory": "builds/virtualbox/{{ user `runid` }}",
-            "vm_name": "{{ user `project_name` }}-base-{{ user `linux_distro` }}",
+            "vm_name": "{{ user `project_name` }}-{{user `playbook`}}-{{ user `linux_distro` }}",
             "vboxmanage": [
                 ["modifyvm", "{{ .Name }}", "--memory", "{{ user `vb_memory` }}"],
                 ["modifyvm", "{{ .Name }}", "--cpus", "{{ user `vb_cpu_cores` }}"]
@@ -98,11 +104,13 @@
         {
             "type": "ansible-local",
             "only": ["box"],
-            "playbook_file": "ansible/playbooks/samvera-base-centos.yml",
-            "galaxy_file": "ansible/requirements/samvera-base-centos.yaml",
+            "playbook_file": "ansible/playbooks/samvera-{{user `playbook`}}-centos.yml",
+            "galaxy_file": "ansible/requirements/samvera-{{user `playbook`}}-centos.yaml",
             "extra_arguments": [
                 "-e \"samvera_db_user={{ user `samvera_db_user` }}\"",
                 "-e \"samvera_db_password={{ user `samvera_db_password` }}\"",
+                "-e \"samvera_admin_user={{ user `samvera_admin_user` }}\"",
+                "-e \"samvera_admin_password={{ user `samvera_admin_password` }}\"",
                 "-e \"fcdb_user={{ user `fcdb_user` }}",
                 "-e \"fcdb_password={{ user `fcdb_password` }}",
                 "-e \"fc_admin_user={{ user `fc_admin_user` }}",
@@ -113,20 +121,25 @@
                 "-e \"timezone={{ user `timezone` }}\"",
                 "-e \"hostname={{ user `hostname` }}\"",
                 "-e \"domain={{ user `domain` }}\"",
+                "-e \"project_owner={{ user `project_owner` }}\"",
                 "-e \"project_name={{ user `project_name` }}\"",
                 "-e \"ssh_keys_to_add={{ user `ssh_keys_to_add` }}\"",
-                "-e \"ansible_sudo_pass=vagrant\""
+                "-e \"aws_access_key_id={{ user `aws_access_key` }}\"",
+                "-e \"aws_secret_key={{ user `aws_secret_key` }}\"",
+                "-e \"aws_bucket={{ user `aws_bucket` }}\""
             ]
         },
         {
             "type": "ansible-local",
             "only": ["ami"],
-            "playbook_file": "ansible/playbooks/samvera-base-centos.yml",
-            "galaxy_file": "ansible/requirements/samvera-base-centos.yaml",
+            "playbook_file": "ansible/playbooks/samvera-{{user `playbook`}}-centos.yml",
+            "galaxy_file": "ansible/requirements/samvera-{{user `playbook`}}-centos.yaml",
             "extra_arguments": [
                 "-e \"samvera_db_user={{ user `samvera_db_user` }}\"",
                 "-e \"samvera_db_password={{ user `samvera_db_password` }}\"",
-                "-e \"fcdb_user={{ user `fcdb_user` }}",
+                "-e \"samvera_admin_user={{ user `samvera_admin_user` }}\"",
+                "-e \"samvera_admin_password={{ user `samvera_admin_password` }}\"",
+                 "-e \"fcdb_user={{ user `fcdb_user` }}",
                 "-e \"fcdb_password={{ user `fcdb_password` }}",
                 "-e \"fc_admin_user={{ user `fc_admin_user` }}",
                 "-e \"fc_admin_password={{ user `fc_admin_password` }}",
@@ -134,8 +147,12 @@
                 "-e \"timezone={{ user `timezone` }}\"",
                 "-e \"hostname={{ user `hostname` }}\"",
                 "-e \"domain={{ user `domain` }}\"",
+                "-e \"project_owner={{ user `project_owner` }}\"",
                 "-e \"project_name={{ user `project_name` }}\"",
-                "-e \"ssh_keys_to_add={{ user `ssh_keys_to_add` }}\""
+                "-e \"ssh_keys_to_add={{ user `ssh_keys_to_add` }}\"",
+                "-e \"aws_access_key_id={{ user `aws_access_key` }}\"",
+                "-e \"aws_secret_key={{ user `aws_secret_key` }}\"",
+                "-e \"aws_bucket={{ user `aws_bucket` }}\""
             ]
         },
         {
@@ -149,14 +166,14 @@
         [{
                 "type": "vagrant",
                 "only": ["box"],
-                "output": "builds/vagrant/{{ user `project_name` }}-base-{{ user `linux_distro` }}.box",
+                "output": "builds/vagrant/{{ user `project_name` }}-{{ user `playbook` }}-{{ user `linux_distro` }}.box",
                 "vagrantfile_template": "vagrant/base/Vagrantfile",
                 "keep_input_artifact": true
             },
             {
                 "type": "vagrant-cloud",
                 "only": ["box"],
-                "box_tag": "{{ user `vagrant_cloud_user` }}/{{ user `project_name` }}-base-{{ user `linux_distro` }}",
+                "box_tag": "{{ user `vagrant_cloud_user` }}/{{ user `project_name` }}-{{ user `playbook` }}-{{ user `linux_distro` }}",
                 "access_token": "{{ user `vagrant_cloud_token` }}",
                 "version": "{{ user `build_version` }}-{{ timestamp }}"
             },
