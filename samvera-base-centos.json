@@ -107,6 +107,7 @@
             "playbook_file": "ansible/playbooks/samvera-{{user `playbook`}}-centos.yml",
             "galaxy_file": "ansible/requirements/samvera-{{user `playbook`}}-centos.yaml",
             "extra_arguments": [
+                "-e \"rails_host_fqdn={{ user `rails_host_fqdn` }}\"",
                 "-e \"samvera_db_user={{ user `samvera_db_user` }}\"",
                 "-e \"samvera_db_password={{ user `samvera_db_password` }}\"",
                 "-e \"samvera_admin_user={{ user `samvera_admin_user` }}\"",
@@ -122,6 +123,7 @@
                 "-e \"hostname={{ user `hostname` }}\"",
                 "-e \"domain={{ user `domain` }}\"",
                 "-e \"project_owner={{ user `project_owner` }}\"",
+                "-e \"project_version={{ user `project_version` }}\"",
                 "-e \"project_name={{ user `project_name` }}\"",
                 "-e \"ssh_keys_to_add={{ user `ssh_keys_to_add` }}\"",
                 "-e \"aws_access_key_id={{ user `aws_access_key` }}\"",
@@ -135,6 +137,7 @@
             "playbook_file": "ansible/playbooks/samvera-{{user `playbook`}}-centos.yml",
             "galaxy_file": "ansible/requirements/samvera-{{user `playbook`}}-centos.yaml",
             "extra_arguments": [
+                "-e \"rails_host_fqdn={{ user `rails_host_fqdn` }}\"",
                 "-e \"samvera_db_user={{ user `samvera_db_user` }}\"",
                 "-e \"samvera_db_password={{ user `samvera_db_password` }}\"",
                 "-e \"samvera_admin_user={{ user `samvera_admin_user` }}\"",
@@ -148,6 +151,7 @@
                 "-e \"hostname={{ user `hostname` }}\"",
                 "-e \"domain={{ user `domain` }}\"",
                 "-e \"project_owner={{ user `project_owner` }}\"",
+                "-e \"project_version={{ user `project_version` }}\"",
                 "-e \"project_name={{ user `project_name` }}\"",
                 "-e \"ssh_keys_to_add={{ user `ssh_keys_to_add` }}\"",
                 "-e \"aws_access_key_id={{ user `aws_access_key` }}\"",

@@ -6,6 +6,7 @@
   gather_facts: yes
   vars:
     project_name: "{{ project_name }}"
+    project_version: "{{ project_version }}"
     project_owner: "{{ project_owner }}"
     git_repo_url: "https://github.com/{{ project_owner }}/{{ project_name }}.git"
     git_repo_branch: "{{ project_version }}"
@@ -14,6 +15,8 @@
     fedora_admin_user: "{{ fc_admin_user }}"
     fedora_admin_password: "{{ fc_admin_password }}"
     fedora_server_fqdn: "{{ solr_fqdn }}"
+    rails_host_fqdn: "{{ }}"
+    enable_ssl: "no"
     env_name: "production"
   roles:
     - { role: uclalib_role_mysql, mysql_install_version: '5.6' }
