@@ -39,7 +39,7 @@
             "secret_key": "{{ user `aws_secret_key` }}",
             "region": "{{ user `aws_region` }}",
             "ssh_keypair_name": "doris-services-keys",
-            "ssh_private_key_file": "./doris-services-keys",
+            "ssh_private_key_file": "../ssh/doris-services-keys",
             "source_ami_filter": {
                 "filters": {
                     "virtualization-type": "hvm",
