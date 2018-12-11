@@ -1,0 +1,27 @@
+---
+- name: uclalib_role_mysql
+  src: https://github.com/uclalibrary/uclalib_role_mysql
+
+- src: "https://github.com/elastic/ansible-elasticsearch"
+  version: "2.x"
+  name: "elastic.elasticsearch"
+
+- src: "https://github.com/artefactual-labs/ansible-percona"
+  version: "master"
+  name: "artefactual.percona"
+
+- src: "https://github.com/notch8/ansible-nginx"
+  version: "master"
+  name: "artefactual.nginx"
+
+- src: "https://github.com/artefactual-labs/ansible-clamav"
+  version: "master"
+  name: "artefactual.clamav"
+
+- src: "https://github.com/artefactual-labs/ansible-gearman.git"
+  version: "master"
+  name: "artefactual.gearman"
+
+- src: "https://github.com/artefactual-labs/ansible-archivematica-src"
+  version: "stable/1.7.x"
+  name: "artefactual.archivematica-src"

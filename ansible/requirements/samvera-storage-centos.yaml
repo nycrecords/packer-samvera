@@ -1,0 +1,12 @@
+- name: uclalib_role_mysql
+  src: https://github.com/uclalibrary/uclalib_role_mysql
+- name: uclalib_role_apache
+  src: https://github.com/uclalibrary/uclalib_role_apache
+- name: solr 
+  src: https://github.com/kevincoakley/ansible-role-solr
+- name: uclalib_role_tomcat
+  src: https://github.com/uclalibrary/uclalib_role_tomcat
+- name: uclalib_role_fedora4
+  src: https://github.com/notch8/uclalib_role_fedora4
+- name: uclalib_role_redis
+  src: https://github.com/uclalibrary/uclalib_role_redis

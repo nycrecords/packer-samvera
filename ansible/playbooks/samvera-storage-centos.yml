@@ -1,0 +1,67 @@
+- hosts: all
+  name: Configure server
+  user: vagrant
+  become: yes
+  become_method: sudo
+  gather_facts: yes
+  vars:
+    project_name: "{{ project_name }}"
+    project_owner: "{{ project_owner }}"
+    env_name: "production"
+    git_repo_url: "https://github.com/{{ project_owner }}/{{ project_name }}.git"
+    git_repo_branch: "{{ project_version }}"
+    cap_deployment: "{{ cap_deployment }}"
+    solr_version: 7.2.0
+    solr_zookeeper_connect_string: 127.0.0.1:2181
+    solr_home: /opt/solr_home
+    solr_port: 8983
+    solr_memory: 2g
+    solr_fqdn: "{{ solr_fqdn }}"
+    tomcat_applications:
+      - app_name: "fedora"
+        shut_port: "8008"
+        conn_port: "8080"
+        rproxy_path: "fcrepo"
+    mysql_databases:
+      - name: "fedora"
+        collation: "utf8_bin"
+        encoding: "utf8"
+        state: "present"
+      - name: "{{ project_name }}"
+        collation: "utf8_bin"
+        encoding: "utf8"
+        state: "present"
+      - name: "{{ project_name }}-test"
+        collation: "utf8_bin"
+        encoding: "utf8"
+        state: "present"
+      - name: "MCP"
+        collation: "utf8_bin"
+        encoding: "utf8"
+        state: "present"
+    mysql_users:
+      - name: "{{ fcdb_user }}"
+        host: "localhost"
+        password: "{{ fcdb_password }}"
+        priv: "fedora.*:ALL"
+        state: "present"
+      - name: "{{ samvera_db_user }}"
+        host: "%"
+        password: "{{ samvera_db_password }}"
+        priv: "{{ project_name }}.*:ALL/{{ project_name }}-test.*:ALL/MCP.*:ALL"
+        state: "present"
+    fedora_db_user: "{{ fcdb_user }}"
+    fedora_db_password: "{{ fcdb_password }}"
+    fedora_db_host: "localhost"
+    fedora_db_port: "3306"
+    fedora_db_name: "fedora"
+    fedora_admin_user: "{{ fc_admin_user }}"
+    fedora_admin_password: "{{ fc_admin_password }}"
+    fedora_server_fqdn: "{{ solr_fqdn }}"
+  roles:
+    - { role: uclalib_role_mysql, mysql_install_version: '5.6' }
+    - { role: uclalib_role_apache }
+    - { role: solr } 
+    - { role: uclalib_role_tomcat }
+    - { role: uclalib_role_fedora4, fedora_version: '4.7.5' }
+    - { role: uclalib_role_redis }

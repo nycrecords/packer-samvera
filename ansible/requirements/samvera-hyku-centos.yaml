@@ -1,0 +1,8 @@
+- name: uclalib_role_mysql
+  src: https://github.com/uclalibrary/uclalib_role_mysql
+- name: uclalib_role_apache
+  src: https://github.com/uclalibrary/uclalib_role_apache
+- name: uclalib_role_passenger
+  src: https://github.com/uclalibrary/uclalib_role_passenger
+- name: uclalib_role_samvera_capdeploy
+  src: https://github.com/notch8/uclalib_role_samvera_capdeploy
