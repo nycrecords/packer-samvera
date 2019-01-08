@@ -6,7 +6,7 @@
   gather_facts: yes
   vars:
     ssh_users:
-      - system_user: "{{ ansible_ssh_user }}"
+      - system_user: "centos"
         github_users:
           - winescout
           - smcfarlane
@@ -76,6 +76,13 @@
     - { role: uclalib_role_nodejs, nodejs_version: '8' }
     - { role: uclalib_role_yarn }
   tasks:
+    - name: install extra packages
+      yum:
+        name: "{{ packages }}"
+      vars:
+        packages:
+          - mysql-devel
+          - vim
     - name: set up N8 ssh keys
       authorized_key: >
         user="{{ item.0.system_user }}"
@@ -83,5 +90,10 @@
       with_subelements:
         - "{{ ssh_users }}"
         - github_users
-
-
+    - name: disable selinux for now
+      shell: 'setenforce 0'
+    - name: disable selinux after reboot
+      lineinfile:
+        path: /etc/selinux/config
+        regexp: '^SELINUX='
+        line: 'SELINUX=permissive'

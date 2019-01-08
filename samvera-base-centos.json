@@ -5,6 +5,8 @@
         "aws_secret_key": "",
         "aws_region": "",
         "aws_bucket": "",
+        "rails_host_fqdn": "",
+        "solr_fqdn": "",
         "samvera_db_user": "",
         "samvera_db_password": "",
         "samvera_admin_user": "",
@@ -54,7 +56,15 @@
             "instance_type": "t2.medium",
             "ssh_username": "centos",
             "ami_name": "{{ user `project_name` }}-{{ user `playbook` }}-{{ user `linux_distro` }} {{ timestamp }}",
-            "ami_description": "A {{ user `playbook` }} box for {{ user `project_name` }} ({{ user `linux_distro` }})"
+            "ami_description": "A {{ user `playbook` }} box for {{ user `project_name` }} ({{ user `linux_distro` }})",
+            "launch_block_device_mappings": [
+              {
+                "device_name": "/dev/sda1",
+                "volume_size": 40,
+                "volume_type": "gp2",
+                "delete_on_termination": true
+              }
+            ]
         },
         {
             "type": "virtualbox-iso",
@@ -108,6 +118,7 @@
             "galaxy_file": "ansible/requirements/samvera-{{user `playbook`}}-centos.yaml",
             "extra_arguments": [
                 "-e \"rails_host_fqdn={{ user `rails_host_fqdn` }}\"",
+                "-e \"solr_fqdn={{ user `solr_fqdn` }}\"",
                 "-e \"samvera_db_user={{ user `samvera_db_user` }}\"",
                 "-e \"samvera_db_password={{ user `samvera_db_password` }}\"",
                 "-e \"samvera_admin_user={{ user `samvera_admin_user` }}\"",
@@ -138,11 +149,12 @@
             "galaxy_file": "ansible/requirements/samvera-{{user `playbook`}}-centos.yaml",
             "extra_arguments": [
                 "-e \"rails_host_fqdn={{ user `rails_host_fqdn` }}\"",
+                "-e \"solr_fqdn={{ user `solr_fqdn` }}\"",
                 "-e \"samvera_db_user={{ user `samvera_db_user` }}\"",
                 "-e \"samvera_db_password={{ user `samvera_db_password` }}\"",
                 "-e \"samvera_admin_user={{ user `samvera_admin_user` }}\"",
                 "-e \"samvera_admin_password={{ user `samvera_admin_password` }}\"",
-                 "-e \"fcdb_user={{ user `fcdb_user` }}",
+                "-e \"fcdb_user={{ user `fcdb_user` }}",
                 "-e \"fcdb_password={{ user `fcdb_password` }}",
                 "-e \"fc_admin_user={{ user `fc_admin_user` }}",
                 "-e \"fc_admin_password={{ user `fc_admin_password` }}",

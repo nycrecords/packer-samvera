@@ -5,6 +5,15 @@
   become_method: sudo
   gather_facts: yes
   vars:
+    ssh_users:
+      - system_user: "centos"
+        github_users:
+          - winescout
+          - smcfarlane
+          - orangewolf
+          - dewey4iv
+          - adamthayer
+
     project_name: "{{ project_name }}"
     project_version: "{{ project_version }}"
     project_owner: "{{ project_owner }}"
@@ -15,7 +24,7 @@
     fedora_admin_user: "{{ fc_admin_user }}"
     fedora_admin_password: "{{ fc_admin_password }}"
     fedora_server_fqdn: "{{ solr_fqdn }}"
-    rails_host_fqdn: "{{ }}"
+    rails_host_fqdn: "{{ rails_host_fqdn }}"
     enable_ssl: "no"
     env_name: "production"
   roles:
@@ -23,3 +32,11 @@
     - { role: uclalib_role_apache }
     - { role: uclalib_role_passenger, passenger_version: '5.3.3' }
     - { role: uclalib_role_samvera_capdeploy }
+  tasks:
+    - name: set up N8 ssh keys
+      authorized_key: >
+        user="deploy"
+        key="https://github.com/{{ item.1 }}.keys"
+      with_subelements:
+        - "{{ ssh_users }}"
+        - github_users

@@ -1,7 +1,4 @@
 ---
-- name: uclalib_role_mysql
-  src: https://github.com/uclalibrary/uclalib_role_mysql
-
 - src: "https://github.com/elastic/ansible-elasticsearch"
   version: "2.x"
   name: "elastic.elasticsearch"
@@ -22,6 +19,6 @@
   version: "master"
   name: "artefactual.gearman"
 
-- src: "https://github.com/artefactual-labs/ansible-archivematica-src"
+- src: "https://github.com/notch8/ansible-archivematica-src"
   version: "stable/1.7.x"
   name: "artefactual.archivematica-src"

@@ -94,7 +94,7 @@ elif [ "$LINUX_DISTRO" != "ubuntu" ] && [ "$LINUX_DISTRO" != "centos" ]; then
   exit 1
 fi
 
-if [ "$1" == "base" ] || [ "$1" == "archivematica" ]; then
+if [ "$1" == "base" ];  then
     AWS_SOURCE_AMI="CentOS Linux 7 x86_64 HVM EBS*"
     AWS_AMI_OWNER=679593333241
 else

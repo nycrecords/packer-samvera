@@ -34,7 +34,7 @@
     es_enable_xpack: false
     es_xpack_features: []
     # Db options
-    archivematica_src_am_db_host: "doris-db.notch8.com"        # Archivematica database host
+    archivematica_src_am_db_host: "{{ solr_fqdn }}"        # Archivematica database host
     archivematica_src_am_db_name: "MCP"              # Archivematica database name
     archivematica_src_am_db_user: "{{ samvera_db_user }}"    # Archivematica database user
     archivematica_src_am_db_password: "{{ samvera_db_password }}"         # Archivematica database password
@@ -99,7 +99,6 @@
         setype: "http_port_t"
         state: "present"
       when: ansible_selinux.status == "enabled"
-
   roles:
     - { role: "elastic.elasticsearch", 
         tags: ["elasticsearch"], 
@@ -122,7 +121,6 @@
           },
         when: "archivematica_src_search_enabled|bool",
       }
-    - { role: uclalib_role_mysql, mysql_install_version: '5.6' }
     - { role: "artefactual.clamav", tags: ["clamav"], become: "yes" }
     - { role: "artefactual.gearman", tags: ["gearman"], become: "yes" }
     - { role: "artefactual.nginx", tags: ["nginx"], become: "yes" }
