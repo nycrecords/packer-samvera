@@ -42,3 +42,7 @@
   src: https://github.com/uclalibrary/uclalib_role_yarn
 - name: uclalib_role_redis
   src: https://github.com/uclalibrary/uclalib_role_redis
+- name: lynis
+  src: tommarshall.Lynis
+- name: ossec-server
+  src: dj-wasabi.ossec-server
