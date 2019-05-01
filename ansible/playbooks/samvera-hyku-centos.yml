@@ -28,10 +28,10 @@
     enable_ssl: "no"
     env_name: "production"
   roles:
-    - { role: uclalib_role_mysql, mysql_install_version: '5.6' }
-    - { role: uclalib_role_apache }
-    - { role: uclalib_role_passenger, passenger_version: '5.3.3' }
-    - { role: uclalib_role_samvera_capdeploy }
+    # - { role: uclalib_role_mysql, mysql_install_version: '5.6' }
+    # - { role: uclalib_role_apache }
+    # - { role: uclalib_role_passenger, passenger_version: '5.3.3' }
+    # - { role: uclalib_role_samvera_capdeploy }
   tasks:
     - name: set up N8 ssh keys
       authorized_key: >
@@ -40,3 +40,8 @@
       with_subelements:
         - "{{ ssh_users }}"
         - github_users
+    - name: Set authorized key for the deploy user
+      authorized_key:
+        user: deploy
+        state: present
+        key: "{{ lookup('file', '../../../ssh/doris-services-keys.pub') }}"
