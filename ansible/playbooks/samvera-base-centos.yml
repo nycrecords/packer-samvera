@@ -8,11 +8,9 @@
     ssh_users:
       - system_user: "centos"
         github_users:
-          - winescout
-          - smcfarlane
-          - orangewolf
-          - dewey4iv
-          - adamthayer
+          - joelbcastillo
+          - g-zhou
+          - johnyu95
 
     project_name: "{{ project_name }}"
     project_owner: "{{ project_owner }}"
@@ -60,21 +58,94 @@
     fedora_admin_user: "{{ fc_admin_user }}"
     fedora_admin_password: "{{ fc_admin_password }}"
     fedora_server_fqdn: "localhost"
+    ossec_server_config:
+      mail_to:
+        - support@notch8.com
+        - appdev@records.nyc.gov
+      mail_smtp_server: localhost
+      mail_from: server@notch8.com
+      frequency_check: 72000
+      ignore_files:
+        - /etc/mtab
+        - /etc/mnttab
+        - /etc/hosts.deny
+      directories:
+        - check_all: 'yes'
+          dirs: /etc,/usr/bin,/usr/sbin
+        - check_all: 'yes'
+          dirs: /bin,/sbin
+      localfiles:
+        - format: 'syslog'
+          location: '/var/log/messages'
+        - format: 'syslog'
+          location: '/var/log/secure'
+      globals:
+        - '127.0.0.1'
+      connection: 'secure'
+      log_level: 1
+      email_level: 7
+      commands:
+        - name: 'host-deny'
+          executable: 'host-deny.sh'
+          expect: 'srcip'
+          timeout_allowed: 'yes'
+      active_responses:
+        - command: 'host-deny'
+          location: 'local'
+          level: 6
+          timeout: 600
+    
+    ossec_agent_configs:
+      - type: os
+        type_value: linux
+        frequency_check: 79200
+        ignore_files:
+          - /etc/mtab
+          - /etc/mnttab
+          - /etc/hosts.deny
+          - /etc/mail/statistics
+          - /etc/svc/volatile
+        directories:
+          - check_all: yes
+            dirs: /etc,/usr/bin,/usr/sbin
+          - check_all: yes
+            dirs: /bin,/sbin
+        localfiles:
+          - format: 'syslog'
+            location: '/var/log/messages'
+          - format: 'syslog'
+            location: '/var/log/secure'
+          - format: 'syslog'
+            location: '/var/log/maillog'
+          - format: 'apache'
+            location: '/var/log/httpd/error_log'
+          - format: 'apache'
+            location: '/var/log/httpd/access_log'
+          - format: 'apache'
+            location: '/var/ossec/logs/active-responses.log'
+    lynis_cron: yes
+    lynis_version: 2.6.8
+    lynis_version_sha256sum: 2e4c5157a4f2d9bb37d3f0f1f5bea03f92233a2a7d4df6eddf231a784087dfac 
+
+
+
   roles:
     - { role: uclalib_role_rhel7repos }
     - { role: uclalib_role_epel }
     - { role: uclalib_role_uclalibrepo }
     - { role: uclalib_role_samvera_basepackages }
-    - { role: uclalib_role_java, oracle_java_version: '1.8.0_191' }
+    - { role: uclalib_role_java, openjdk_java_version: '1.8.0' }
     - { role: uclalib_role_clamav }
     - { role: uclalib_role_pip }
     - { role: uclalib_role_imagemagick }
-    - { role: uclalib_role_libreoffice, libreoffice_version: '6.0.7' }
+    - { role: uclalib_role_libreoffice, libreoffice_version: '6.2.3' }
     - { role: uclalib_role_ffmpeg, ffmpeg_download_url: 'https://www.johnvansickle.com/ffmpeg/old-releases/ffmpeg-4.0.3-64bit-static.tar.xz' }
     - { role: uclalib_role_fits, fits_version: '1.3.0' }
     - { role: uclalib_role_ruby, ruby_version: '2.5.1' }
     - { role: uclalib_role_nodejs, nodejs_version: '8' }
     - { role: uclalib_role_yarn }
+    - { role: ossec-server, become: yes }
+    - { role: lynis, tags: [lynis], become: yes }
   tasks:
     - name: install extra packages
       yum:

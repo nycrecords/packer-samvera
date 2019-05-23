@@ -40,3 +40,12 @@
       with_subelements:
         - "{{ ssh_users }}"
         - github_users
+
+    - name: read the deploy key from centos user
+      shell: "head -n 1 /home/centos/.ssh/authorized_keys"
+      register: deploy_key
+
+    - name: Copy aws ssh key from centos to deploy
+      lineinfile:
+        path: "/home/deploy/.ssh/authorized_keys"
+        line: "{{ deploy_key.stdout }}"
