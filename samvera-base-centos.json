@@ -1,45 +1,76 @@
 {
     "variables": {
         "build_version": "",
-        "aws_access_key": "",
-        "aws_secret_key": "",
-        "aws_region": "",
-        "aws_bucket": "",
+        "playbook": "base",
+        "project_name": "",
+        "project_owner": "",
+        "project_version": "",
+        "runid": "{{env `PACKER_RUN_UUID`}}",
+
+        "cap_deployment": "",
+        "domain": "",
+        "geonames_username": "",  
+        "hostname": "",
+        "linux_distro": "",
+        "root_db_password": "",
+        "ssh_keys_to_add": "",
+        "timezone": "",
+
         "rails_host_fqdn": "",
         "solr_fqdn": "",
-        "samvera_db_user": "",
-        "samvera_db_password": "",
-        "samvera_admin_user": "",
+
         "samvera_admin_password": "",
-        "fcdb_user": "",
+        "samvera_admin_user": "",
+        "samvera_db_password": "",
+        "samvera_db_user": "",
+
         "fcdb_password": "",
-        "root_db_password": "",
-        "timezone": "",
-        "hostname": "",
-        "domain": "",
-        "project_name": "",
-        "ssh_keys_to_add": "",
+        "fcdb_user": "",
+
+        "aws_access_key": "",
+        "aws_ami_owner": "",
+        "aws_bucket": "",
+        "aws_region": "",
+        "aws_secret_key": "",
+        "aws_source_ami": "",
+        "aws_ssh_bastion_host": "",
+        "aws_ssh_bastion_port": "",
+        "aws_ssh_bastion_private_key_file": "",
+        "aws_ssh_bastion_username": "",
+
+        "az_client_id": "",
+        "az_client_secret": "",
+        "az_image_offer": "",
+        "az_image_publisher": "",
+        "az_image_sku": "",
+        "az_image_version": "",
+        "az_location": "",
+        "az_managed_image_rg_name": "",
+        "az_subscription_id": "",
+        "az_tenant_id": "",
+
+        "vb_cpu_cores": "",
+        "vb_memory": "4096",
+        
+        "centos_version": "7",
         "vagrant_cloud_token": "",
         "vagrant_cloud_user": "",
-        "centos_version": "7",
-        "vagrant_source_iso": "CentOS-7-x86_64-Minimal-1810.iso",
-        "vagrant_source_iso_sha256_checksum": "38d5d51d9d100fd73df031ffd6bd8b1297ce24660dc8c13a3b8b4534a4bd291c",
-        "vagrant_guest_additions_iso": "http://download.virtualbox.org/virtualbox/5.2.12/VBoxGuestAdditions_5.2.12.iso",
         "vagrant_guest_additions_iso_sha256_checksum": "b81d283d9ef88a44e7ac8983422bead0823c825cbfe80417423bd12de91b8046",
-        "aws_source_ami": "CentOS Linux 7 x86_64 HVM EBS*",
-        "aws_ami_owner": "679593333241",
-        "vb_memory": "4096",
-        "vb_cpu_cores": "",
-        "runid": "{{env `PACKER_RUN_UUID`}}",
-        "linux_distro": "",
-        "playbook": "base"
+        "vagrant_guest_additions_iso": "http://download.virtualbox.org/virtualbox/5.2.12/VBoxGuestAdditions_5.2.12.iso",
+        "vagrant_source_iso_sha256_checksum": "38d5d51d9d100fd73df031ffd6bd8b1297ce24660dc8c13a3b8b4534a4bd291c",
+        "vagrant_source_iso": "CentOS-7-x86_64-Minimal-1810.iso"
     },
-    "builders": [{
+    "builders": [
+        {
             "type": "amazon-ebs",
             "name": "ami",
             "access_key": "{{ user `aws_access_key` }}",
             "secret_key": "{{ user `aws_secret_key` }}",
             "region": "{{ user `aws_region` }}",
+            "ssh_bastion_username": "{{ user `aws_ssh_bastion_username` }}",
+            "ssh_bastion_host": "{{ user `aws_ssh_bastion_host` }}",
+            "ssh_bastion_port": "{{ user `aws_ssh_bastion_port` }}",
+            "ssh_bastion_private_key_file": "{{ user `aws_ssh_bastion_private_key_file` }}",
             "ssh_keypair_name": "doris-services-keys",
             "ssh_private_key_file": "../ssh/doris-services-keys",
             "source_ami_filter": {
@@ -48,7 +79,9 @@
                     "name": "{{ user `aws_source_ami` }}",
                     "root-device-type": "ebs"
                 },
-                "owners": ["{{ user `aws_ami_owner` }}"],
+                "owners": [
+                    "{{ user `aws_ami_owner` }}"
+                ],
                 "most_recent": true
             },
             "force_deregister": true,
@@ -58,13 +91,31 @@
             "ami_name": "{{ user `project_name` }}-{{ user `playbook` }}-{{ user `linux_distro` }} {{ timestamp }}",
             "ami_description": "A {{ user `playbook` }} box for {{ user `project_name` }} ({{ user `linux_distro` }})",
             "launch_block_device_mappings": [
-              {
-                "device_name": "/dev/sda1",
-                "volume_size": 40,
-                "volume_type": "gp2",
-                "delete_on_termination": true
-              }
+                {
+                    "device_name": "/dev/sda1",
+                    "volume_size": 40,
+                    "volume_type": "gp2",
+                    "delete_on_termination": true
+                }
             ]
+        },
+        {
+            "type": "azure-arm",
+            "name": "arm",
+
+            "client_id": "{{ user `az_client_id` }}",
+            "client_secret": "{{ user `az_client_secret` }}",
+            "tenant_id": "{{ user `az_tenant_id` }}",
+            "subscription_id": "{{ user `az_subscription_id` }}",
+
+            "managed_image_resource_group_name": "{{ user `az_managed_image_rg_name` }}",
+            "managed_image_name": "{{ user `project_name` }}-{{ user `playbook` }}-{{ user `linux_distro` }}-{{ timestamp }}",
+            "os_type": "Linux",
+            "image_publisher": "{{ user `az_image_publisher` }}",
+            "image_offer": "{{ user `az_image_offer` }}",
+            "image_sku": "{{ user `az_image_sku` }}",
+            "location": "{{ user `az_location` }}",
+            "vm_size": "Standard_b2s"
         },
         {
             "type": "virtualbox-iso",
@@ -94,26 +145,45 @@
             "output_directory": "builds/virtualbox/{{ user `runid` }}",
             "vm_name": "{{ user `project_name` }}-{{user `playbook`}}-{{ user `linux_distro` }}",
             "vboxmanage": [
-                ["modifyvm", "{{ .Name }}", "--memory", "{{ user `vb_memory` }}"],
-                ["modifyvm", "{{ .Name }}", "--cpus", "{{ user `vb_cpu_cores` }}"]
+                [
+                    "modifyvm",
+                    "{{ .Name }}",
+                    "--memory",
+                    "{{ user `vb_memory` }}"
+                ],
+                [
+                    "modifyvm",
+                    "{{ .Name }}",
+                    "--cpus",
+                    "{{ user `vb_cpu_cores` }}"
+                ]
             ]
         }
     ],
-    "provisioners": [{
+    "provisioners": [
+        {
             "type": "shell",
-            "only": ["ami", "box"],
+            "only": [
+                "ami",
+                "arm",
+                "box"
+            ],
             "execute_command": "echo 'vagrant' | {{ .Vars }} /usr/bin/sudo -S -E bash '{{ .Path }}'",
             "script": "scripts/setup-base.sh"
         },
         {
             "type": "shell",
-            "only": ["box"],
+            "only": [
+                "box"
+            ],
             "execute_command": "echo 'vagrant' | {{ .Vars }} /usr/bin/sudo -S -E bash '{{ .Path }}'",
             "script": "scripts/setup-vagrant.sh"
         },
         {
             "type": "ansible-local",
-            "only": ["box"],
+            "only": [
+                "box"
+            ],
             "playbook_file": "ansible/playbooks/samvera-{{user `playbook`}}-centos.yml",
             "galaxy_file": "ansible/requirements/samvera-{{user `playbook`}}-centos.yaml",
             "extra_arguments": [
@@ -144,7 +214,10 @@
         },
         {
             "type": "ansible-local",
-            "only": ["ami"],
+            "only": [
+                "ami",
+                "arm"
+            ],
             "playbook_file": "ansible/playbooks/samvera-{{user `playbook`}}-centos.yml",
             "galaxy_file": "ansible/requirements/samvera-{{user `playbook`}}-centos.yaml",
             "extra_arguments": [
@@ -173,29 +246,40 @@
         },
         {
             "type": "shell",
-            "only": ["ami", "box"],
+            "only": [
+                "ami",
+                "arm",
+                "box"
+            ],
             "execute_command": "echo 'vagrant' | {{ .Vars }} /usr/bin/sudo -S -E bash '{{ .Path }}'",
             "script": "scripts/cleanup.sh"
         }
     ],
     "post-processors": [
-        [{
+        [
+            {
                 "type": "vagrant",
-                "only": ["box"],
+                "only": [
+                    "box"
+                ],
                 "output": "builds/vagrant/{{ user `project_name` }}-{{ user `playbook` }}-{{ user `linux_distro` }}.box",
                 "vagrantfile_template": "vagrant/base/Vagrantfile",
                 "keep_input_artifact": true
             },
             {
                 "type": "vagrant-cloud",
-                "only": ["box"],
+                "only": [
+                    "box"
+                ],
                 "box_tag": "{{ user `vagrant_cloud_user` }}/{{ user `project_name` }}-{{ user `playbook` }}-{{ user `linux_distro` }}",
                 "access_token": "{{ user `vagrant_cloud_token` }}",
                 "version": "{{ user `build_version` }}-{{ timestamp }}"
             },
             {
                 "type": "shell-local",
-                "only": ["box"],
+                "only": [
+                    "box"
+                ],
                 "inline": [
                     "mv builds/virtualbox/{{ user `runid` }}/* builds/virtualbox/",
                     "rmdir builds/virtualbox/{{ user `runid` }}"

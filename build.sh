@@ -62,8 +62,8 @@ function printUsage() {
   echo '  ./build.sh hyrax ami'
   echo '  ./build.sh base box'
   echo '  ./build.sh hyrax box'
-#  echo '  ./build.sh base image'
-#  echo '  ./build.sh hyrax image'
+  echo '  ./build.sh base arm'
+  echo '  ./build.sh hyrax arm'
 
   exit 1
 }
@@ -125,12 +125,13 @@ FILTER=(jq '.["post-processors"][0] |= map(select(.type != "vagrant-cloud"))' sa
 
 if [ -z "$1" ]; then
   printUsage
-elif [ "$2" == "ami" ] || [ "$2" == "box" ]; then
+elif [ "$2" == "ami" ] || [ "$2" == "arm" ] || [ "$2" == "box" ]; then
     if [ "$1" == "base" ] || [ "$1" == "storage" ] || [ "$1" == "archivematica" ] || [ "$1" == "hyku" ] || [ "$1" == "hyrax" ]; then
      TMPFILE=$(mktemp)
      "${FILTER[@]}" > "$TMPFILE"
      PACKER_LOG="$PACKER_LOG" packer "$PACKER_ACTION" -only="$2" -var-file="config.json" $ON_ERROR \
-       -var="linux_distro=$LINUX_DISTRO" -var="vb_memory=$VB_MEMORY" -var="vb_cpu_cores=$VB_CPU_CORES" -var="playbook=$1" -var="aws_source_ami=$AWS_SOURCE_AMI" -var="aws_ami_owner=$AWS_AMI_OWNER" \
+       -var="linux_distro=$LINUX_DISTRO" -var="vb_memory=$VB_MEMORY" -var="vb_cpu_cores=$VB_CPU_CORES" \
+       -var="playbook=$1" -var="aws_source_ami=$AWS_SOURCE_AMI" -var="aws_ami_owner=$AWS_AMI_OWNER" \
        -var="build_version=$BUILD_VERSION" "$TMPFILE"
   else
     printUsage

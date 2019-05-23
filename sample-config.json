@@ -1,25 +1,40 @@
 {
-  "aws_access_key": "YOUR_ACCESS_KEY_HERE",
-  "aws_secret_key": "YOUR_SECRET_KEY_HERE",
-  "aws_region": "us-east-1",
-  "samvera_db_user": "demo_db_user",
-  "samvera_db_password": "demo_db_password",
-  "samvera_admin_user": "admin@example.org",
-  "samvera_admin_password": "demo_admin_password",
-  "fcdb_user": "demo_fc_user",
-  "fcdb_password": "demo_fc_password",
-  "root_db_password": "demo_root_db_password",
-  "timezone": "America/Los_Angeles",
-  "hostname": "localhost",
-  "domain": "localhost",
   "project_name": "nurax",
   "project_owner": "ksclarke",
   "project_version": "test",
+  
   "cap_deployment": "localhost",
-  "vagrant_cloud_token": "",
-  "vagrant_cloud_user": "",
+  "domain": "localhost",
+  "geonames_username": "YOUR_GEONAMES_USERNAME_HERE",  
+  "hostname": "localhost",
+  "linux_distro": "centos",
+  "root_db_password": "demo_root_db_password",
   "ssh_keys_to_add": "['https://github.com/ksclarke.keys','https://github.com/bess.keys','https://github.com/mark-dce.keys','https://github.com/hardyoyo.keys']",
-  "docker_user": "",
-  "geonames_username": "YOUR_GEONAMES_USERNAME_HERE",
-  "linux_distro": "centos"
+  "timezone": "America/Los_Angeles",
+
+  "samvera_admin_password": "demo_admin_password",
+  "samvera_admin_user": "admin@example.org",
+  "samvera_db_password": "demo_db_password",
+  "samvera_db_user": "demo_db_user",
+  
+  "fcdb_password": "demo_fc_password",
+  "fcdb_user": "demo_fc_user",
+
+  "aws_access_key": "YOUR_ACCESS_KEY_HERE",
+  "aws_region": "us-east-1",
+  "aws_secret_key": "YOUR_SECRET_KEY_HERE",
+  
+  "az_client_id": "fe354398-d7sf-4dc9-87fd-c432cd8a7e09",
+  "az_client_secret": "keepitsecret&#*$",
+  "az_image_offer": "CentOS",
+  "az_image_publisher": "OpenLogic",
+  "az_image_sku": "7.5",
+  "az_image_version": "7.5.20180815",
+  "az_location": "eastus",
+  "az_managed_image_rg_name": "packerdemo",
+  "az_subscription_id": "44cae533-4247-4093-42cf-897ded6e7823",
+  "az_tenant_id": "de39842a-caba-497e-a798-7896aea43218",
+
+  "vagrant_cloud_token": "",
+  "vagrant_cloud_user": ""
 }
