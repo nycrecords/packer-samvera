@@ -99,6 +99,16 @@
         setype: "http_port_t"
         state: "present"
       when: ansible_selinux.status == "enabled"
+
+    - name: "Ensure pip, setuptools, virtualenv are not installed from packages"
+      package:
+        name: "{{ item }}"
+        state: "absent"
+      with_items:
+        - "python-pip"
+        - "python2-pip"
+        - "python-virtualenv"
+
   roles:
     - { role: "elastic.elasticsearch", 
         tags: ["elasticsearch"], 
@@ -121,7 +131,8 @@
           },
         when: "archivematica_src_search_enabled|bool",
       }
-    - { role: "artefactual.clamav", tags: ["clamav"], become: "yes" }
+    # comes from base image
+    #- { role: "artefactual.clamav", tags: ["clamav"], become: "yes" }
     - { role: "artefactual.gearman", tags: ["gearman"], become: "yes" }
     - { role: "artefactual.nginx", tags: ["nginx"], become: "yes" }
     - { role: "artefactual.archivematica-src", tags: ["archivematica-src"], become: "yes" }
