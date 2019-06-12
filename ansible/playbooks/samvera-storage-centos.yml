@@ -58,6 +58,7 @@
     fedora_admin_user: "{{ fc_admin_user }}"
     fedora_admin_password: "{{ fc_admin_password }}"
     fedora_server_fqdn: "{{ solr_fqdn }}"
+    fedora_url: "{{ fc_download_war_url }}"
   roles:
     - { role: uclalib_role_mysql, mysql_install_version: '5.6' }
     - { role: uclalib_role_apache }
