@@ -13,12 +13,12 @@
     archivematica_src_ss_gunicorn: "true"
     archivematica_src_am_dashboard_gunicorn: "true"
     archivematica_src_am_multi_venvs: "yes"
-    
+
     # reset setup vars, commented out here, uncomment if needed
     #archivematica_src_reset_am_all: "true"
     #archivematica_src_reset_ss_db: "true"
-    
-    # elasticsearch role, general settings 
+
+    # elasticsearch role, general settings
     # (instance specific settings are in the playbook )
     es_scripts: false
     es_templates: false
@@ -34,15 +34,23 @@
     es_enable_xpack: false
     es_xpack_features: []
     # Db options
-    archivematica_src_am_db_host: "{{ solr_fqdn }}"        # Archivematica database host
-    archivematica_src_am_db_name: "MCP"              # Archivematica database name
-    archivematica_src_am_db_user: "{{ samvera_db_user }}"    # Archivematica database user
-    archivematica_src_am_db_password: "{{ samvera_db_password }}"         # Archivematica database password
-    archivematica_src_am_migrate_from_v1_4: "false"  # Migrate AM database from v1.4 to v1.5
-    archivematica_src_ss_migrate_from_v0_7: "false"  # Migrate AM database from v1.4 to v1.5
-    archivematica_src_am_create_db: "false"           # Create database (uses root's credentials in ~/.my.cnf)
-    archivematica_src_am_create_dbuser: "false"       # Create user database (uses root's credentials in ~/.my.cnf)
-    archivematica_src_am_wait_local_mysql: "false"    # MCPServer upstart service to wait until MySQL is locally available
+    archivematica_src_am_db_host: localhost
+    archivematica_src_am_db_name: "MCP"
+    archivematica_src_am_db_user: "{{ samvera_db_user }}"
+    archivematica_src_am_db_password: "{{ samvera_db_password }}"
+    archivematica_src_am_migrate_from_v1_4: False
+    archivematica_src_ss_migrate_from_v0_7: False
+    archivematica_src_am_create_db: True
+    archivematica_src_am_create_dbuser: True
+    archivematica_src_am_wait_local_mysql: True
+
+    archivematica_src_reset_mcpdb: True
+    archivematica_src_reset_shareddir: True
+    archivematica_src_reset_es: True
+    archivematica_src_reset_am_all: True
+    archivematica_src_reset_ss_db: True
+
+
     # AM configure vars
     archivematica_src_configure_dashboard: "yes"
     archivematica_src_configure_ss: "yes"
@@ -109,17 +117,36 @@
         - "python2-pip"
         - "python-virtualenv"
 
+    - name: "Mysql Server for local deploy"
+      package:
+        name: "{{ item }}"
+        state: "present"
+      with_items:
+        - mariadb
+        - mariadb-server
+        - mariadb-libs
+        - MySQL-python
+        - perl-DBD-MySQL
+    - name: Ensure MySQL is started and enabled on boot.
+      service: "name=mysqld state=started enabled=true"
+
+    - name: Create mysql user
+      mysql_user:
+        name: "{{ archivematica_src_am_db_user }}"
+        password: "{{ archivematica_src_am_db_password }}"
+        priv: '*.*:ALL'
+        state: present
   roles:
-    - { role: "elastic.elasticsearch", 
-        tags: ["elasticsearch"], 
+    - { role: "elastic.elasticsearch",
+        tags: ["elasticsearch"],
         become: "yes",
         # instance specific settings here, general settings in host_vars
-        es_instance_name: "node1", 
-        es_data_dirs: "/opt/elasticsearch/data", 
-        es_log_dir: "/opt/elasticsearch/logs", 
-        es_work_dir: "/opt/elasticsearch/temp", 
+        es_instance_name: "node1",
+        es_data_dirs: "/opt/elasticsearch/data",
+        es_log_dir: "/opt/elasticsearch/logs",
+        es_work_dir: "/opt/elasticsearch/temp",
         es_config: {
-          node.name: "node1", 
+          node.name: "node1",
           cluster.name: "cluster1",
           http.port: 9200,
           transport.tcp.port: 9300,
@@ -127,7 +154,7 @@
           node.master: true,
           bootstrap.mlockall: true,
           discovery.zen.ping.multicast.enabled: false,
-          http.max_content_length: 1024mb 
+          http.max_content_length: 1024mb
           },
         when: "archivematica_src_search_enabled|bool",
       }
@@ -139,7 +166,7 @@
 
   tasks:
     - name: "change home dir perms (to make transfer source visible)"
-      command: "chmod 755 $HOME" 
+      command: "chmod 755 $HOME"
       tags: "homeperms"
       become: "no"
 
@@ -150,4 +177,3 @@
          state: "present"
       with_items:
         - s3fs-fuse
-
