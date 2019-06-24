@@ -9,12 +9,14 @@
 
         "cap_deployment": "",
         "domain": "",
-        "geonames_username": "",  
+        "geonames_username": "",
         "hostname": "",
         "linux_distro": "",
         "root_db_password": "",
         "ssh_keys_to_add": "",
         "timezone": "",
+        "fc_download_war_url": "",
+
 
         "rails_host_fqdn": "",
         "solr_fqdn": "",
@@ -33,10 +35,6 @@
         "aws_region": "",
         "aws_secret_key": "",
         "aws_source_ami": "",
-        "aws_ssh_bastion_host": "",
-        "aws_ssh_bastion_port": "",
-        "aws_ssh_bastion_private_key_file": "",
-        "aws_ssh_bastion_username": "",
 
         "az_client_id": "",
         "az_client_secret": "",
@@ -51,7 +49,7 @@
 
         "vb_cpu_cores": "",
         "vb_memory": "4096",
-        
+
         "centos_version": "7",
         "vagrant_cloud_token": "",
         "vagrant_cloud_user": "",
@@ -60,17 +58,12 @@
         "vagrant_source_iso_sha256_checksum": "38d5d51d9d100fd73df031ffd6bd8b1297ce24660dc8c13a3b8b4534a4bd291c",
         "vagrant_source_iso": "CentOS-7-x86_64-Minimal-1810.iso"
     },
-    "builders": [
-        {
+    "builders": [{
             "type": "amazon-ebs",
             "name": "ami",
             "access_key": "{{ user `aws_access_key` }}",
             "secret_key": "{{ user `aws_secret_key` }}",
             "region": "{{ user `aws_region` }}",
-            "ssh_bastion_username": "{{ user `aws_ssh_bastion_username` }}",
-            "ssh_bastion_host": "{{ user `aws_ssh_bastion_host` }}",
-            "ssh_bastion_port": "{{ user `aws_ssh_bastion_port` }}",
-            "ssh_bastion_private_key_file": "{{ user `aws_ssh_bastion_private_key_file` }}",
             "ssh_keypair_name": "doris-services-keys",
             "ssh_private_key_file": "../ssh/doris-services-keys",
             "source_ami_filter": {
@@ -90,14 +83,12 @@
             "ssh_username": "centos",
             "ami_name": "{{ user `project_name` }}-{{ user `playbook` }}-{{ user `linux_distro` }} {{ timestamp }}",
             "ami_description": "A {{ user `playbook` }} box for {{ user `project_name` }} ({{ user `linux_distro` }})",
-            "launch_block_device_mappings": [
-                {
-                    "device_name": "/dev/sda1",
-                    "volume_size": 40,
-                    "volume_type": "gp2",
-                    "delete_on_termination": true
-                }
-            ]
+            "launch_block_device_mappings": [{
+                "device_name": "/dev/sda1",
+                "volume_size": 40,
+                "volume_type": "gp2",
+                "delete_on_termination": true
+            }]
         },
         {
             "type": "azure-arm",
@@ -160,8 +151,7 @@
             ]
         }
     ],
-    "provisioners": [
-        {
+    "provisioners": [{
             "type": "shell",
             "only": [
                 "ami",
@@ -197,6 +187,7 @@
                 "-e \"fcdb_password={{ user `fcdb_password` }}",
                 "-e \"fc_admin_user={{ user `fc_admin_user` }}",
                 "-e \"fc_admin_password={{ user `fc_admin_password` }}",
+                "-e \"fc_download_war_url={{ user `fc_download_war_url` }}",
                 "-e \"os_user=vagrant",
                 "-e \"os_password=vagrant",
                 "-e \"postgres_pass={{ user `root_db_password` }}\"",
@@ -256,8 +247,7 @@
         }
     ],
     "post-processors": [
-        [
-            {
+        [{
                 "type": "vagrant",
                 "only": [
                     "box"

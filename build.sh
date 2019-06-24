@@ -94,12 +94,12 @@ elif [ "$LINUX_DISTRO" != "ubuntu" ] && [ "$LINUX_DISTRO" != "centos" ]; then
   exit 1
 fi
 
-if [ "$1" == "base" ];  then
-    AWS_SOURCE_AMI="CentOS Linux 7 x86_64 HVM EBS*"
-    AWS_AMI_OWNER=679593333241
+if [ "$1" == "base" ]; then
+  AWS_SOURCE_AMI="CentOS Linux 7 x86_64 HVM EBS*"
+  AWS_AMI_OWNER=679593333241
 else
-    AWS_SOURCE_AMI="${PROJECT_NAME}-base-${LINUX_DISTO}*"
-    AWS_AMI_OWNER=self
+  AWS_SOURCE_AMI="${PROJECT_NAME}-base-${LINUX_DISTO}*"
+  AWS_AMI_OWNER=self
 fi
 
 # Label a build artifact pushed to Vagrant Cloud with either SNAPSHOT or a tag/branch name
@@ -126,24 +126,24 @@ FILTER=(jq '.["post-processors"][0] |= map(select(.type != "vagrant-cloud"))' sa
 if [ -z "$1" ]; then
   printUsage
 elif [ "$2" == "ami" ] || [ "$2" == "arm" ] || [ "$2" == "box" ]; then
-    if [ "$1" == "base" ] || [ "$1" == "storage" ] || [ "$1" == "archivematica" ] || [ "$1" == "hyku" ] || [ "$1" == "hyrax" ]; then
-     TMPFILE=$(mktemp)
-     "${FILTER[@]}" > "$TMPFILE"
-     PACKER_LOG="$PACKER_LOG" packer "$PACKER_ACTION" -only="$2" -var-file="config.json" $ON_ERROR \
-       -var="linux_distro=$LINUX_DISTRO" -var="vb_memory=$VB_MEMORY" -var="vb_cpu_cores=$VB_CPU_CORES" \
-       -var="playbook=$1" -var="aws_source_ami=$AWS_SOURCE_AMI" -var="aws_ami_owner=$AWS_AMI_OWNER" \
-       -var="build_version=$BUILD_VERSION" "$TMPFILE"
+  if [ "$1" == "base" ] || [ "$1" == "storage" ] || [ "$1" == "archivematica" ] || [ "$1" == "hyku" ] || [ "$1" == "hyrax" ]; then
+    TMPFILE=$(mktemp)
+    "${FILTER[@]}" >"$TMPFILE"
+    PACKER_LOG="$PACKER_LOG" packer "$PACKER_ACTION" -only="$2" -var-file="config.json" $ON_ERROR \
+      -var="linux_distro=$LINUX_DISTRO" -var="vb_memory=$VB_MEMORY" -var="vb_cpu_cores=$VB_CPU_CORES" \
+      -var="playbook=$1" -var="aws_source_ami=$AWS_SOURCE_AMI" -var="aws_ami_owner=$AWS_AMI_OWNER" \
+      -var="build_version=$BUILD_VERSION" "$TMPFILE"
   else
     printUsage
   fi
 elif [ "$2" == "fast" ] || [ -z "$2" ]; then
   if [ "$1" == "base" ] || [ "$1" == "hyrax" ]; then
-     TMPFILE=$(mktemp)
-     "${FILTER[@]}" > "$TMPFILE"
-     PACKER_LOG="$PACKER_LOG" packer "$PACKER_ACTION" -var-file="config.json" $ON_ERROR \
-       -var="linux_distro=$LINUX_DISTRO" -var="vb_memory=$VB_MEMORY" -var="vb_cpu_cores=$VB_CPU_CORES" \
-       -var="build_version=$BUILD_VERSION" -var="playbook=$1" -var="aws_source_ami=$AWS_SOURCE_AMI" \
-       -var="aws_ami_owner=$AWS_AMI_OWNER" "$TMPFILE"
+    TMPFILE=$(mktemp)
+    "${FILTER[@]}" >"$TMPFILE"
+    PACKER_LOG="$PACKER_LOG" packer "$PACKER_ACTION" -var-file="config.json" $ON_ERROR \
+      -var="linux_distro=$LINUX_DISTRO" -var="vb_memory=$VB_MEMORY" -var="vb_cpu_cores=$VB_CPU_CORES" \
+      -var="build_version=$BUILD_VERSION" -var="playbook=$1" -var="aws_source_ami=$AWS_SOURCE_AMI" \
+      -var="aws_ami_owner=$AWS_AMI_OWNER" "$TMPFILE"
   else
     printUsage
   fi

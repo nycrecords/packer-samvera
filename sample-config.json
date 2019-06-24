@@ -2,10 +2,10 @@
   "project_name": "nurax",
   "project_owner": "ksclarke",
   "project_version": "test",
-  
+
   "cap_deployment": "localhost",
   "domain": "localhost",
-  "geonames_username": "YOUR_GEONAMES_USERNAME_HERE",  
+  "geonames_username": "YOUR_GEONAMES_USERNAME_HERE",
   "hostname": "localhost",
   "linux_distro": "centos",
   "root_db_password": "demo_root_db_password",
@@ -16,14 +16,14 @@
   "samvera_admin_user": "admin@example.org",
   "samvera_db_password": "demo_db_password",
   "samvera_db_user": "demo_db_user",
-  
+
   "fcdb_password": "demo_fc_password",
   "fcdb_user": "demo_fc_user",
 
   "aws_access_key": "YOUR_ACCESS_KEY_HERE",
   "aws_region": "us-east-1",
   "aws_secret_key": "YOUR_SECRET_KEY_HERE",
-  
+
   "az_client_id": "fe354398-d7sf-4dc9-87fd-c432cd8a7e09",
   "az_client_secret": "keepitsecret&#*$",
   "az_image_offer": "CentOS",
