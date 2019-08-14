@@ -1,6 +1,7 @@
 #! /bin/bash
 
 # Do some general cleanup
-cd /home/vagrant
+[ -d "/home/centos" ] && cd /home/centos
+[ -d "/home/vagrant" ] && cd /home/vagrant
 rm -rf install
 rm -f nodesource_setup.sh

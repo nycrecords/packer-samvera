@@ -6,7 +6,7 @@
   gather_facts: yes
   vars:
     ssh_users:
-      - system_user: "centos"
+      - system_user: vagrant
         github_users:
           - joelbcastillo
           - g-zhou

@@ -106,7 +106,8 @@
             "image_offer": "{{ user `az_image_offer` }}",
             "image_sku": "{{ user `az_image_sku` }}",
             "location": "{{ user `az_location` }}",
-            "vm_size": "Standard_b2s"
+            "vm_size": "Standard_b2s",
+            "ssh_username": "vagrant"
         },
         {
             "type": "virtualbox-iso",
