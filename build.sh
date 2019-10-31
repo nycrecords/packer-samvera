@@ -30,12 +30,15 @@ DEFAULT_MEMORY=2048
 if [ "$3" == "fast" ] || [ "$2" == "fast" ]; then
   if hash getconf 2>/dev/null; then
     if hash free 2>/dev/null; then
-      VB_MEMORY=$(free -m | awk '/^Mem:/{print $7}')
-      VB_CPU_CORES=$(getconf _NPROCESSORS_ONLN)
-
-      if [ $? -ne 0 ]; then
-        VB_CPU_CORES=${DEFAULT_CORE_COUNT}
+      if [ "$(free -m | awk '/^Mem:/{print $7}')" -ne 0 ]; then
         VB_MEMORY=${DEFAULT_MEMORY}
+      else
+        VB_MEMORY=$(free -m | awk '/^Mem:/{print $7}')
+      fi
+      if [ "$(getconf _NPROCESSORS_ONLN)" -ne 0 ]; then
+        VB_CPU_CORES=${DEFAULT_CORE_COUNT}
+      else
+        VB_CPU_CORES=$(getconf _NPROCESSORS_ONLN)
       fi
     else
       VB_CPU_CORES=${DEFAULT_CORE_COUNT}
@@ -81,10 +84,10 @@ if [ ! -f config.json ]; then
 fi
 
 # Get variables we need to check the latest version and desired distro
-PROJECT_NAME=$(cat config.json | jq -r '.project_name')
-PROJECT_OWNER=$(cat config.json | jq -r '.project_owner')
-PROJECT_VERSION=$(cat config.json | jq -r '.project_version')
-LINUX_DISTRO=$(cat config.json | jq -r '.linux_distro')
+PROJECT_NAME=$(jq -r '.project_name' config.json)
+PROJECT_OWNER=$(jq -r '.project_owner' config.json)
+PROJECT_VERSION=$(jq -r '.project_version' config.json)
+LINUX_DISTRO=$(jq -r '.linux_distro' config.json)
 
 # Check with Linux distro we want to use with the build
 if [ -z "$LINUX_DISTRO" ]; then
@@ -98,7 +101,7 @@ if [ "$1" == "base" ]; then
   AWS_SOURCE_AMI="CentOS Linux 7 x86_64 HVM EBS*"
   AWS_AMI_OWNER=679593333241
 else
-  AWS_SOURCE_AMI="${PROJECT_NAME}-base-${LINUX_DISTO}*"
+  AWS_SOURCE_AMI="${PROJECT_NAME}-base-${LINUX_DISTRO}*"
   AWS_AMI_OWNER=self
 fi
 
@@ -117,11 +120,11 @@ else
 
   PURPLE='\033[0;35m'
   NC='\033[0m'
-  printf "${PURPLE}Building ${PROJECT_OWNER}/${PROJECT_NAME} ${BUILD_VERSION}${NC}\n\n"
+  printf "%s Building %s/%s %s %s\n\n" "${PURPLE}" "${PROJECT_OWNER}" "${PROJECT_NAME}" "${BUILD_VERSION}" "${NC}"
 fi
 
 # We need to filter the JSON because Packer doesn't support tagged/conditional post-processors
-FILTER=(jq '.["post-processors"][0] |= map(select(.type != "vagrant-cloud"))' samvera-base-${LINUX_DISTRO}.json)
+FILTER=(jq '.["post-processors"][0] |= map(select(.type != "vagrant-cloud"))' "samvera-base-${LINUX_DISTRO}.json")
 
 if [ -z "$1" ]; then
   printUsage

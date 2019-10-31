@@ -1,34 +1,54 @@
 # Packer Samvera
 
-A project to build a [Samvera/Hyrax](https://github.com/samvera/hyrax) developer's box using [Packer](https://www.packer.io/). A Hyrax project must first be "capified" to work with packer-samvera. Some initial [documentation](docs/howto-hyrax-centos.md) for this process is available. If you're looking for a project as a working example, you can check out UCLA's [Californica](https://github.com/UCLALibrary/californica/) project as an example.
+A project to build a [Samvera/Hyrax](https://github.com/samvera/hyrax) box using [Packer](https://www.packer.io/). A Hyrax project must first be "capified" to work with packer-samvera. Some initial [documentation](docs/howto-hyrax-centos.md) for this process is available. If you're looking for a project as a working example, you can check out UCLA's [Californica](https://github.com/UCLALibrary/californica/) project as an example.
 
-There are currently two possible outputs from this Packer Samvera build: an AWS AMI (stored in your AWS space) and/or a Vagrant VirtualBox.
+There are currently three possible outputs from this Packer Samvera build:
+
+- an AWS AMI
+- an Azure Managed Image
+- a Vagrant VirtualBox.
 
 ## Requirements
 
-Bash is required to run the wrapper script. [Packer](https://www.packer.io/downloads.html) is required to run the build. And, [jq](https://stedolan.github.io/jq/download/) is required to work around a 
-[Packer limitation](https://github.com/hashicorp/packer/issues/2679).
+### General
+
+- Bash is required to run the wrapper script.
+- [Packer](https://www.packer.io/downloads.html) is required to run the build.
+- [jq](https://stedolan.github.io/jq/download/) is required to work around a [Packer limitation](https://github.com/hashicorp/packer/issues/2679).
 
 There are also some optional requirements, depending on the type of output you desire:
 
-* An [AWS account](https://aws.amazon.com/) if you want to create AMIs
-* [Vagrant](https://www.vagrantup.com/) and [VirtualBox](https://www.virtualbox.org/) installed on your local machine if you want to use Vagrant
+#### AWS
 
-If you decide to use Vagrant, you'll also need to install a few additional things on your host system:
+- An [AWS account](https://aws.amazon.com/)
 
-* An SSH agent to handle GitHub commits and deploying to a remote server (GitHub has [a page on setting up ssh-agent](https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/) on different platforms if you've not done this before)
-* [SSHFS](https://github.com/libfuse/sshfs) and the [Vagrant SSHFS plugin](https://github.com/dustymabe/vagrant-sshfs) to expose the Hyrax source code to your host machine (Note: How you install these will vary depending on your OS, but both are available in the Ubuntu repositories)
+#### Azure
+
+- An [Azure account](https://portal.azure.com/)
+- A storage account
+
+#### Vagrant (Development Only)
+
+- [Vagrant](https://www.vagrantup.com/)
+- [VirtualBox](https://www.virtualbox.org/) installed on your local machine if you want to use Vagrant
 
 ## Getting Started
 
 Copy the `sample-config.json` file to `config.json` and add or change its variables as needed. You can skip variables that aren't relevant to your build (e.g. AWS credentials if you're building a Vagrant box).
 
-The Packer build is basically done in two steps. The first builds a "base box" with all the necessary system dependencies installed and the second installs a Hyrax application from a GitHub repo. The default Hyrax application is Nurax, which if I understand correctly is a snapshot/sandbox environment.
+The Packer build is basically done in two steps. The first builds a "base box" with all the necessary system dependencies installed and the second installs a Hyrax application from a GitHub repo. The default Hyrax application is DORIS Hyku.
 
 ### How to Build a Samvera-Hyrax AWS AMI (In Two Steps)
 
     ./build.sh base ami
     ./build.sh hyrax ami
+
+The second step can be run independently (and repeatedly) once the first has been successfully run.
+
+### How to Build a Samvera-Hyrax Azure Managed Image (In Two Steps)
+
+    ./build.sh base arm
+    ./build.sh hyrax arm
 
 The second step can be run independently (and repeatedly) once the first has been successfully run.
 
@@ -51,7 +71,7 @@ After that you can bring it up and, if you want, SSH into it:
     vagrant up
     vagrant ssh
 
-Hyrax's Web application is exposed at http://localhost:8080 (and at http://localhost:3000 for those familar with Rails); Fedora is exposed at http://localhost:8984/fcrepo/rest; and, Solr is exposed at http://localhost:8983/solr.
+Hyrax's Web application is exposed at <http://localhost:8080> (and at <http://localhost:3000> for those familar with Rails); Fedora is exposed at <http://localhost:8984/fcrepo/rest;> and, Solr is exposed at <http://localhost:8983/solr.>
 
 > Hint: In case you were wondering what happened to `vagrant init` in the above steps... by changing into the `vagrant/hyrax` directory, we changed into the directory that has the box's Vagrantfile. If you use the prebuilt version of samvera-hyrax, mentioned below, you would also need to run `vagrant init` to get a local copy of the Vagrantfile.
 
@@ -59,8 +79,8 @@ Hyrax's Web application is exposed at http://localhost:8080 (and at http://local
 
 An alternative to building the Vagrant box yourself is to just use one of the prebuilt ones:
 
-* [ksclarke/samvera-hyrax](https://app.vagrantup.com/ksclarke/boxes/samvera-hyrax) &nbsp; [[source code on GitHub](https://github.com/ksclarke/nurax)]
-* [uclalibrary/californica](https://app.vagrantup.com/uclalibrary/boxes/californica) &nbsp; [[source code on GitHub](https://github.com/UCLALibrary/californica/)]
+- [ksclarke/samvera-hyrax](https://app.vagrantup.com/ksclarke/boxes/samvera-hyrax) &nbsp; [[source code on GitHub](https://github.com/ksclarke/nurax)]
+- [uclalibrary/californica](https://app.vagrantup.com/uclalibrary/boxes/californica) &nbsp; [[source code on GitHub](https://github.com/UCLALibrary/californica/)]
 
 The steps to do that are pretty simple:
 
@@ -78,10 +98,12 @@ If you want to interact with the box's services, you can see the passwords for t
 
 ## Configuration
 
-#### Git
+### Git
+
 The VirtualBox VM will, by default, use the `.gitconfig` and `.gitignore` files from the developer's host system. This saves the developer from having to configure Git on the guest VM, but it does mean that there may be differences between VMs from different developers. For instance, if one developer uses a lot of Git aliases, those will only exist on their guest VM. If that developer is working on a team, it would be important not to assume that another developer is using the same Git conveniences / configuration when talking about how one uses the VM.
 
-#### Ports
+### Ports
+
 The VirtualBox VM's Web, search, and repository services are exposed, externally, at different ports from the ones they run at within the virtual machine. Inside the VM, these services run at port 80 (Hyrax), port 8080 (Fedora), and port 8983 (Solr). The services are exposed at different ports outside of the VM, though, to mirror what's in the upstream developer documentation (and to mirror what developers not currently using the virtual machine will be accustomed to expect). Outside the VM, from the perspective of the developer, the ports are 8080 for the Hyrax Web application, 8984 for Fedora, and 8983 for Solr.
 
 ## Gotchas
@@ -94,4 +116,4 @@ If your build hangs at the SSH connection (fwiw, this does usually take a really
 
 ## Contacts
 
-If you have any questions, suggestions, comments, etc., about the build feel free to send them to Kevin S. Clarke &lt;<a href="mailto:ksclarke@ksclarke.io">ksclarke@ksclarke.io</a>&gt;
+If you have any questions, suggestions, comments, etc., about the build feel free to send them to Kevin S. Clarke &lt;[ksclarke@ksclarke.io](mailto:ksclarke@ksclarke.io)</a>&gt;

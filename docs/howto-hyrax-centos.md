@@ -1,6 +1,6 @@
-### Capify a Rails app to be run on CentOS the packer-samvera way
+# Capify a Rails app to be run on CentOS the packer-samvera way
 
-Capifying a project just means to construct it in such a way that it works with Capistrano, which is what packer-samvera uses. There are a series of steps that need to be made...
+Capifying a project just means to construct it in such a way that it works with Capistrano, which is what packer-samvera uses.
 
 First, check out the project and ensure the tests pass.
 
@@ -56,21 +56,21 @@ Use the following for your Gemfile or make sure the dependencies in it are also 
 ```ruby
     # frozen_string_literal: true
     source 'https://rubygems.org'
-    
+
     git_source(:github) do |repo_name|
       repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?('/')
       "https://github.com/#{repo_name}.git"
     end
-    
+
     ruby '>= 2.4.0', '<= 2.5.99'
-    
+
     gem 'darlingtonia', '~> 1.0'
     gem 'honeybadger', '~> 3.1'
     gem 'hyrax', '~> 2.2', '>= 2.2.2'
     gem 'rails', '~> 5.1.6'
-    
+
     gem 'pkg-config', '~> 1.1'
-    
+
     # Use mysql
     gem 'mysql2', '~> 0.5'
     # Use Puma as the app server
@@ -81,7 +81,7 @@ Use the following for your Gemfile or make sure the dependencies in it are also 
     gem 'uglifier', '>= 1.3.0'
     # See https://github.com/rails/execjs#readme for more supported runtimes
     # gem 'therubyracer', platforms: :ruby
-    
+
     # Use CoffeeScript for .coffee assets and views
     gem 'coffee-rails', '~> 4.2'
     # Turbolinks makes navigating your web application faster. Read more: https://github.com/turbolinks/turbolinks
@@ -90,7 +90,7 @@ Use the following for your Gemfile or make sure the dependencies in it are also 
     gem 'jbuilder', '~> 2.5'
     # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
     gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
-    
+
     gem 'devise'
     gem 'devise-guests', '~> 0.6'
     gem 'dotenv-rails', '~> 2.2.1'
@@ -101,7 +101,7 @@ Use the following for your Gemfile or make sure the dependencies in it are also 
     gem 'rsolr', '>= 1.0'
     gem 'sidekiq', '~> 5.1.3'
     gem 'whenever', require: false
-    
+
     group :development do
       # Use Capistrano for deployment automation
       gem "capistrano", "~> 3.11", require: false
@@ -118,7 +118,7 @@ Use the following for your Gemfile or make sure the dependencies in it are also 
       gem 'spring'
       gem 'spring-watcher-listen', '~> 2.0.0'
     end
-    
+
     group :development, :test do
       gem 'bixby', '~> 1.0.0'
       # Call 'byebug' anywhere in the code to stop execution and get a debugger console
@@ -139,7 +139,6 @@ Use the following for your Gemfile or make sure the dependencies in it are also 
 Run `bundle install` from within the project directory
 
 > *Note:* If `pg` and `sidekiq` haven't been added to the project yet, chances are good they aren't really setup properly. Don't forget to go back and check that.
-
 > *Note:* Pinning `pg` to a pre-1.0 version is necessary because of [this bug](https://github.com/rails/rails/issues/31678). Hopefully this will not always be the case.
 
 Make some DCE specific stages, instead of just the defaults: `bundle exec cap install STAGES=localhost,sandbox,qa,staging,production`
@@ -152,9 +151,9 @@ Make some DCE specific stages, instead of just the defaults: `bundle exec cap in
 
 Edit the newly created `config/deploy.rb` file:
 
-  * Add the `:application` name
-  * Add the github `:repo_url`
-  * Add this boilerplate, customizing as appropriate:
+- Add the `:application` name
+- Add the github `:repo_url`
+- Add this boilerplate, customizing as appropriate:
 
 ```ruby
     set :log_level, :debug
@@ -202,9 +201,8 @@ Edit the newly created `config/deploy.rb` file:
     end
 ```
 
-> *Note:* You do NOT want the `:passenger_restart_with_touch` option. This will prevent passenger from automatically restarting after you deploy.
-
-> See: https://github.com/capistrano/passenger#restarting-passenger--4033-applications
+> *Note:* You do NOT want the `:passenger_restart_with_touch` option. This will prevent passenger from automatically restarting after you deploy.  
+> See: <https://github.com/capistrano/passenger#restarting-passenger--4033-applications>
 
 Add this content to your `Capfile`:
 
@@ -229,6 +227,4 @@ Add this content to your `Capfile`:
 
 Make sure to supply all the variables in the project's `config.json` file (consult the `sample-config.json` file for possible variables) are supplied.
 
-This is a first pass of this process and is, most likely, incomplete. If you have trouble using a Hyrax project with 
-packer-samvera, we'd be interested in hearing your experiences. The project's [issues 
-queue](https://github.com/uclalibrary/packer-samvera/issues) is a good way to communicate.
+This is a first pass of this process and is, most likely, incomplete. If you have trouble using a Hyrax project with packer-samvera, we'd be interested in hearing your experiences. The project's [issues queue](https://github.com/uclalibrary/packer-samvera/issues) is a good way to communicate.
